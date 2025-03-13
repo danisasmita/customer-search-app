@@ -1,40 +1,100 @@
-**Additionally, you must run the backend first before running this application.
-**
-Running the Backend
+# Customer Search Application
 
-Clone the backend repository:
+## ⚙️ Start the Backend Project First
+Before cloning and running the frontend, make sure to start the backend project by following these steps:
 
-https://github.com/danisasmita/customer-search
+```bash
+git clone https://github.com/danisasmita/customer-search.git
+```
 
-**Running the Next.js Project
-**
-Clone the frontend repository:
+Navigate to the backend project directory:
 
-git clone https://github.com/danisasmita/customer-search-app.git
+```bash
+cd customer-search
+```
 
-Navigate to the project folder:
+Copy and configure the environment file:
 
-cd customer-search-app
+```bash
+cp .env.example .env
+```
+
+Update the `.env` file with your database credentials.
 
 Install dependencies:
 
-npm install
+```bash
+go mod tidy
+```
 
-**Start the project:
-**
+Run the database migration and seed data:
 
-npm run dev
+```bash
+go run cmd/main.go --migrate --seed
+```
 
-Open the application in your browser at:
+Start the backend application:
 
-http://localhost:3000
+```bash
+go run cmd/main.go
+```
 
-Build & Deployment
+## 🚀 Clone the Frontend Repository
+To register, log in, and search for customers, set up the frontend project:
 
-To build the Next.js project for production, run:
+```bash
+git clone https://github.com/danisasmita/customer-search-app.git
+```
 
-npm run build
+Navigate to the frontend project directory:
 
-Then start the production server:
+```bash
+cd customer-search-app
+```
 
-npm start
+## 🔧 Install Frontend Dependencies
+Make sure Node.js and npm/yarn are installed, then run:
+
+```bash
+npm install  
+```
+**or**
+```bash
+yarn install  
+```
+
+## ▶️ Start the Frontend Application
+Run the frontend application with:
+
+```bash
+npm run dev  
+```
+**or**
+```bash
+yarn dev  
+```
+
+Once the application is running, open it in your browser. You can now register, log in, and search for customers directly from the frontend. 🚀
+
+## 🔍 Example Customer Data for Search
+Here are some example customer records you can search for in the application:
+
+| Name            | Email                 |
+|----------------|----------------------|
+| John Doe       | john@example.com      |
+| Jane Smith     | jane@example.com      |
+| Robert Johnson | robert@example.com    |
+| Emily Davis    | emily@example.com     |
+| Michael Wilson | michael@example.com   |
+| Sarah Brown    | sarah@example.com     |
+| David Lee      | david@example.com     |
+| Jennifer Taylor| jennifer@example.com  |
+| Kevin Martinez | kevin@example.com     |
+| Lisa Anderson  | lisa@example.com      |
+| Thomas Wright  | thomas@example.com    |
+
+You can now search for customers by name or email using the search feature in the frontend application! 🎯
+
+## ✅ Quick Access
+You can **register, log in, and search for customer data** immediately after starting the frontend application.
+
