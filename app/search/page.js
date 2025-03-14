@@ -63,7 +63,7 @@ const SearchBar = ({
                   key={index}
                   onClick={() => {
                     setSearchQuery(suggestion.name || suggestion.email || suggestion.bank_accounts[0]?.account_number);
-                    setSuggestions([]);
+                    setSuggestions([]); 
                   }}
                   className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors duration-200"
                 >
@@ -103,7 +103,7 @@ const CustomerDetail = ({ customer, selectedCustomer, setSelectedCustomer, searc
           </p>
         </div>
         <div className="text-sm text-gray-600">
-          {customer.bank_accounts[0]?.account_number && (
+          {customer.bank_accounts?.[0]?.account_number && (
             <p>Account: {highlightText(customer.bank_accounts[0].account_number, searchQuery)}</p>
           )}
         </div>
@@ -115,28 +115,28 @@ const CustomerDetail = ({ customer, selectedCustomer, setSelectedCustomer, searc
         <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
           <div>
             <dt className="text-sm font-medium text-gray-500">Full Name</dt>
-            <dd className="mt-1 text-sm text-gray-900">{customer.name}</dd>
+            <dd className="mt-1 text-sm text-gray-900">{customer.name || 'N/A'}</dd>
           </div>
           <div>
             <dt className="text-sm font-medium text-gray-500">Email</dt>
-            <dd className="mt-1 text-sm text-gray-900">{customer.email}</dd>
+            <dd className="mt-1 text-sm text-gray-900">{customer.email || 'N/A'}</dd>
           </div>
           <div>
             <dt className="text-sm font-medium text-gray-500">Account Number</dt>
             <dd className="mt-1 text-sm text-gray-900">
-              {customer.bank_accounts[0]?.account_number || 'N/A'}
+              {customer.bank_accounts?.[0]?.account_number || 'N/A'}
             </dd>
           </div>
           <div>
             <dt className="text-sm font-medium text-gray-500">Balance</dt>
             <dd className="mt-1 text-sm text-gray-900">
-              ${customer.bank_accounts[0]?.balance?.toFixed(2) || '0.00'}
+              ${customer.bank_accounts?.[0]?.balance?.toFixed(2) || '0.00'}
             </dd>
           </div>
           <div className="sm:col-span-2">
             <dt className="text-sm font-medium text-gray-500">Pockets</dt>
             <dd className="mt-1 text-sm text-gray-900">
-              {customer.pockets.length > 0 ? (
+              {customer.pockets?.length > 0 ? (
                 customer.pockets.map((pocket, index) => (
                   <div key={index}>
                     {pocket.name}: ${pocket.balance?.toFixed(2) || '0.00'}
@@ -150,7 +150,7 @@ const CustomerDetail = ({ customer, selectedCustomer, setSelectedCustomer, searc
           <div className="sm:col-span-2">
             <dt className="text-sm font-medium text-gray-500">Term Deposits</dt>
             <dd className="mt-1 text-sm text-gray-900">
-              {customer.term_deposits.length > 0 ? (
+              {customer.term_deposits?.length > 0 ? (
                 customer.term_deposits.map((deposit, index) => (
                   <div key={index}>
                     Amount: ${deposit.amount?.toFixed(2) || '0.00'}, Duration: {deposit.duration} months
@@ -173,16 +173,20 @@ const CustomerList = ({ customers, selectedCustomer, setSelectedCustomer, search
       <h2 className="text-xl font-semibold text-gray-800">Search Results</h2>
     </div>
     <div className="p-6">
-      {customers.map((customer, index) => (
-        <CustomerDetail
-          key={index}
-          customer={customer}
-          selectedCustomer={selectedCustomer}
-          setSelectedCustomer={setSelectedCustomer}
-          searchQuery={searchQuery}
-          highlightText={highlightText}
-        />
-      ))}
+      {customers.length > 0 ? (
+        customers.map((customer, index) => (
+          <CustomerDetail
+            key={index}
+            customer={customer}
+            selectedCustomer={selectedCustomer}
+            setSelectedCustomer={setSelectedCustomer}
+            searchQuery={searchQuery}
+            highlightText={highlightText}
+          />
+        ))
+      ) : (
+        <p className="text-gray-600">No customers found.</p>
+      )}
     </div>
   </div>
 );
@@ -195,7 +199,6 @@ export default function CustomerSearch() {
   const [customers, setCustomers] = useState([]);
   const [message, setMessage] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState(null);
-
   const [suggestions, setSuggestions] = useState([]);
 
   useEffect(() => {
@@ -209,13 +212,17 @@ export default function CustomerSearch() {
     }
 
     try {
+      console.log('Fetching suggestions for query:', query); 
       const response = await searchCustomers(query);
-      if (response.status === 'success' && response.data.length > 0) {
+      console.log('API Response:', response); 
+
+      if (response.data && Array.isArray(response.data) && response.data.length > 0) {
         setSuggestions(response.data);
       } else {
         setSuggestions([]);
       }
     } catch (err) {
+      console.error('Failed to fetch suggestions:', err); 
       setSuggestions([]);
     }
   };
@@ -238,9 +245,9 @@ export default function CustomerSearch() {
       setLoading(true);
       const response = await searchCustomers(searchQuery);
 
-      if (response.status === 'success' && response.data.length > 0) {
-        setCustomers(response.data);
-        setMessage(response.message || `Found ${response.data.length} customer(s)`);
+      if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+        setCustomers(response.data); 
+        setMessage(`Found ${response.data.length} customer(s)`);
       } else {
         setError('No customers found with the provided search query');
       }
@@ -261,7 +268,7 @@ export default function CustomerSearch() {
   };
 
   const highlightText = (text, query) => {
-    if (!query || !text) return text || '';
+    if (!query || !text) return text || 'N/A';
 
     const regex = new RegExp(`(${query})`, 'gi');
     return text.split(regex).map((part, index) =>
@@ -299,15 +306,13 @@ export default function CustomerSearch() {
         {error && <ErrorMessage message={error} />}
         {message && <SuccessMessage message={message} />}
         
-        {customers.length > 0 && (
-          <CustomerList
-            customers={customers}
-            selectedCustomer={selectedCustomer}
-            setSelectedCustomer={setSelectedCustomer}
-            searchQuery={searchQuery}
-            highlightText={highlightText}
-          />
-        )}
+        <CustomerList
+          customers={customers}
+          selectedCustomer={selectedCustomer}
+          setSelectedCustomer={setSelectedCustomer}
+          searchQuery={searchQuery}
+          highlightText={highlightText}
+        />
       </div>
     </div>
   );
