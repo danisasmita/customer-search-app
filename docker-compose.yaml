@@ -1,0 +1,11 @@
+services:
+  # Embed UI for submiting contact form from client side
+  client-contact-form:
+    build: .
+    image: client-contact-form:1.0.0
+    container_name: client-contact-form
+    restart: on-failure
+    ports:
+      - "3000:3000"
+    environment:
+      - API_URL=http://localhost:8080/
