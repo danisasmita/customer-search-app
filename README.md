@@ -73,6 +73,12 @@ npm run dev
 ```bash
 yarn dev  
 ```
+Run the frontend application with Docker:
+
+```bash
+docker-compose build 
+docker-compose up -d    
+```
 
 Once the application is running, open it in your browser. You can now register, log in, and search for customers directly from the frontend. 🚀
 
